@@ -55,7 +55,7 @@ void setup() {
   int my_channel = scan_channel_switch(); //on récupère le channel en fonction des switchs
   Serial.println("Setting channel...");
   setChannel(my_channel+48);//set channel prend un char en paramètre. +48 (correspondance tabme table ASCII)
-
+  Serial.println("Setup completed successfully");
 }
 
 void loop() {
@@ -230,6 +230,7 @@ int scan_channel_switch(void){  //Lecture des switchs de channel radio
 
 void setChannel(int mode){  //Paramétrage du channel radio
   openATmode(); //Ouverture du mode commande
+  Serial.println("Writing channel...");
   XBeeSerial.write('A');  //Commande permettant de modifier le channel d'émission
   XBeeSerial.write('T');
   XBeeSerial.write('C');
