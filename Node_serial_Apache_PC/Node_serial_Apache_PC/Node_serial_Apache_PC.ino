@@ -34,7 +34,9 @@ void openATmode(void);  //Ouvre le mode de commande du mosule XBee
 void closeATmode(void); //Ferme le mode de commaned du module XBee
 
 void setup() {
-  Serial.begin(57600); 
+  Serial.begin(57600);
+  while(!Serial){;}
+  Serial.println("Setup starting...");
   XBeeSerial.begin(57600);
   delay(50);
   pinMode(2, INPUT_PULLUP); //pullups integrées associées aux switchs
@@ -45,10 +47,13 @@ void setup() {
   pinMode(7, INPUT_PULLUP);
   pinMode(8, INPUT_PULLUP);
   pinMode(9, INPUT_PULLUP);
+  Serial.println("Scanning address switches...");
   int my_address = scan_address_switch(); //on récupère l'adresse en fonctions des switchs
   frame_ID[1] = my_address;
   frame_ID[0] = my_address>>8;
+  Serial.println("Scanning channel switches...");
   int my_channel = scan_channel_switch(); //on récupère le channel en fonction des switchs
+  Serial.println("Setting channel...");
   setChannel(my_channel+48);//set channel prend un char en paramètre. +48 (correspondance tabme table ASCII)
 
 }
@@ -341,16 +346,20 @@ void setChannel(int mode){  //Paramétrage du channel radio
 }
 
 void openATmode(void){  //Ouverture du mode AT
+	Serial.println("Opening AT Mode...");
   while(XBeeSerial.available()){XBeeSerial.read();} //On vide le buffer SerialXBee
   while(!XBeeSerial.available()){ //Tant que le module ne répond pas OK, on continue à demander le mode AT
     XBeeSerial.write('+');  //Commande pour déclencher le mode AT
     XBeeSerial.write('+');
     XBeeSerial.write('+');
     delay(1200);
+    Serial.println("Sending opening command...");
   }
+  Serial.println("AT Mode opened");
 }
 
 void closeATmode(void){ //Fermeture du mode AT
+	Serial.println("Closing AT Mode...");
   while(XBeeSerial.available()){XBeeSerial.read();}
   while(!XBeeSerial.available()){
     XBeeSerial.write('A');
@@ -360,6 +369,7 @@ void closeATmode(void){ //Fermeture du mode AT
     XBeeSerial.write('\r');
     delay(200);
   }
+  Serial.println("AT Mode closed");
 }
 
 
