@@ -9,17 +9,17 @@ bool isBusy = true; //activé si le module XBee est occupé. Ceci empêche le sp
 int error_watch = 0;  //compteur d'erreurs du module XBee. On reset si cette variable dépasse une certaine valeur
 int busyCnt = 0;  //Compte le nombre de fois que le module est Busy d'affilée. Permet de détecter si lemodule a crashé (ça peut arriver...)
 byte frame_number = 1;  //Le numéro de trame est indicatif, il permet de valider l'émission réussie (mode API du XBee...)
-byte frame_header[17] = {0x7E, 0x00, 0x2E, 0x10, frame_number, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xFF, 0xFF, 0xFF, 0xFE, 0x00, 0x00}; //Broadcast
+byte frame_header[17] = {0x7E, 0x00, 0x74, 0x10, frame_number, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0xFF, 0xFF, 0xFF, 0xFE, 0x00, 0x00}; //Broadcast
 //byte frame_header[17] = {0x7E, 0x00, 0x18, 0x10, frame_number, 0x00, 0x13, 0xA2, 0x00, 0x41, 0x77, 0xE1, 0x89, 0xFF, 0xFE, 0x00, 0x00}; //XCTU
 #if DEMOMODE
   byte frame_payload[8] = {0x11,0x22,0x33,0x44,0x55,0x66,0x77,0x88}; //Demo mode
 #else
-  byte frame_payload[30];
+  byte frame_payload[100];
 #endif
 byte frame_ID[2] = {'I', 'D'};  //ID par défaut, redéfinit dans le setup par les switchs
 byte api_frame[100];  //déclaration de la frame reçue par le XBee. 100 car on ignore sa taille (on prend large). A améliorer.
 byte received_ID[2];  //ID reçu par la trame XBee
-byte received_payload[30]; //données reçues par la trame XBee
+byte received_payload[100]; //données reçues par la trame XBee
 
 void checkSerial (void);  //lit le port série
 void XBeeStatusCheck (void);  //vérifie que le module XBee est toujours up
@@ -73,7 +73,7 @@ void checkSerial (void){
       //Serial.print(frame_payload[i]);
       delay(1);//nécessaire sinon on lit plus vite qu'on ne reçoit
       i++;
-      if(i>=30){break;}//On ne travaille qu'avec des trames de 8 octets
+      if(i>=100){break;}//On ne travaille qu'avec des trames de 8 octets
     }
     //Serial.println(i);
     //Serial.println(frame_payload[0]);
@@ -154,7 +154,7 @@ void decode_frame(void){
     //Serial.print(char(received_ID[i]));
   }
   //Serial.print(" DATA : ");
-  for(int i=0; i<30; i++){
+  for(int i=0; i<100; i++){
     received_payload[i] = api_frame[i+17];
     Serial.print(char(received_payload[i]));
   }
@@ -182,7 +182,7 @@ void sendXBee (void){ //création de la trame
       checksum += frame_ID[i];
       XBeeSerial.write(frame_ID[i]);  //On envoie l'ID tout en gérant le checksum
     }
-    for (int i=0; i<30; i++){
+    for (int i=0; i<100; i++){
       checksum += frame_payload[i];
       XBeeSerial.write(frame_payload[i]); //On envoie la donnée tout en gérant le checksum
     }
